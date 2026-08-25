@@ -37,6 +37,10 @@ export async function GET() {
 
        console.log('CUSTOMERS COUNT:', customers?.length ?? 0);
     console.log('CUSTOMERS NAMES:', customers?.map((c) => c.full_name));
+console.log(
+  'SUPABASE PROJECT:',
+  process.env.NEXT_PUBLIC_SUPABASE_URL
+);
  
 const customersWithStats = (customers ?? []).map((customer) => {
       const customerOrders = (orders ?? []).filter(
