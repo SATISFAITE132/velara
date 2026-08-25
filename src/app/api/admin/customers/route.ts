@@ -41,6 +41,23 @@ console.log(
   'SUPABASE PROJECT:',
   process.env.NEXT_PUBLIC_SUPABASE_URL
 );
+console.log(
+  'SUPABASE KEY ROLE:',
+  (() => {
+    try {
+      const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!key) return 'MISSING';
+
+      const payload = JSON.parse(
+        Buffer.from(key.split('.')[1], 'base64').toString()
+      );
+
+      return payload.role ?? 'NO_ROLE';
+    } catch {
+      return 'INVALID_KEY';
+    }
+  })()
+);
  
 const customersWithStats = (customers ?? []).map((customer) => {
       const customerOrders = (orders ?? []).filter(
