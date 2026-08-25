@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 
+type OrderItem = {
+  name: string;
+  size?: string;
+  quantity: number;
+  price: number;
+};
+
 type Order = {
   id: string;
   order_number: string;
@@ -15,6 +22,7 @@ type Order = {
     | 'delivered'
     | 'cancelled';
   total: number;
+  items: OrderItem[];
   shipping_address?: {
     fullName?: string;
     line1?: string;
@@ -59,6 +67,7 @@ export default function AdminOrdersPage() {
           created_at: o.created_at,
           status: o.status,
           total: Number(o.total || 0),
+          items: Array.isArray(o.items) ? o.items : [],
           shipping_address: o.shipping_address ?? {},
         }))
       );
@@ -119,7 +128,10 @@ export default function AdminOrdersPage() {
         .includes(search) ||
       o.shipping_address?.phone
         ?.toLowerCase()
-        .includes(search)
+        .includes(search) ||
+      o.items.some((item) =>
+        item.name?.toLowerCase().includes(search)
+      )
     );
   });
 
@@ -156,6 +168,7 @@ export default function AdminOrdersPage() {
               <tr className="text-left text-obsidian/50 border-b border-obsidian/10">
                 <th className="p-4">Order</th>
                 <th className="p-4">Customer</th>
+                <th className="p-4">Products</th>
                 <th className="p-4">Address</th>
                 <th className="p-4">Date</th>
                 <th className="p-4">Status</th>
@@ -185,6 +198,36 @@ export default function AdminOrdersPage() {
                     <div>
                       {o.shipping_address?.phone || '—'}
                     </div>
+                  </td>
+
+                  {/* Products */}
+                  <td className="p-4">
+                    {o.items.length > 0 ? (
+                      <div className="space-y-2 min-w-[220px]">
+                        {o.items.map((item, index) => (
+                          <div
+                            key={`${item.name}-${index}`}
+                            className="text-obsidian/70"
+                          >
+                            <div className="font-medium text-obsidian">
+                              {item.name}
+                            </div>
+
+                            <div className="text-xs text-obsidian/50">
+                              {item.size
+                                ? `${item.size} · `
+                                : ''}
+                              Qty: {item.quantity} · $
+                              {Number(item.price).toFixed(2)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-obsidian/40">
+                        No products
+                      </span>
+                    )}
                   </td>
 
                   {/* Address */}
@@ -248,7 +291,7 @@ export default function AdminOrdersPage() {
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="p-8 text-center text-obsidian/40"
                   >
                     No orders match your search.
