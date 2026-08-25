@@ -35,7 +35,10 @@ export async function GET() {
       );
     }
 
-    const customersWithStats = (customers ?? []).map((customer) => {
+       console.log('CUSTOMERS COUNT:', customers?.length ?? 0);
+    console.log('CUSTOMERS NAMES:', customers?.map((c) => c.full_name));
+ 
+const customersWithStats = (customers ?? []).map((customer) => {
       const customerOrders = (orders ?? []).filter(
         (order) => order.customer_id === customer.id
       );
