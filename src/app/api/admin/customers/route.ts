@@ -9,8 +9,10 @@ export async function GET() {
    const { data, error } = await supabase
   .from('customers')
   .select('id, full_name, email, phone, created_at')
-  .order('created_at', { ascending: false })
-  .limit(1000);
+  .order('created_at', { ascending: false });
+
+console.log('CUSTOMERS COUNT:', data?.length ?? 0);
+console.log('CUSTOMERS NAMES:', data?.map((c) => c.full_name));
 
     if (error) {
       console.error('Customers GET error:', error);
