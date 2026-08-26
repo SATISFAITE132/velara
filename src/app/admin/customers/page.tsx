@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 type Customer = {
   id: string;
@@ -16,11 +16,18 @@ export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function loadCustomers() {
+  const loadCustomers = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/customers', {
-  cache: 'no-store',
-});
+      const response = await fetch(
+        `/api/admin/customers?t=${Date.now()}`,
+        {
+          method: 'GET',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Could not load customers');
@@ -28,27 +35,41 @@ export default function AdminCustomersPage() {
 
       const data = await response.json();
 
-     setCustomers(
-  data.map((customer: any) => ({
-    ...customer,
-    orders: Number(customer.orders || 0),
-    totalSpent: Number(customer.totalSpent || 0),
-  }))
-);
+      const normalizedCustomers: Customer[] = Array.isArray(data)
+        ? data.map((customer: any) => ({
+            id: customer.id,
+            full_name: customer.full_name ?? '',
+            email: customer.email ?? '',
+            phone: customer.phone ?? null,
+            created_at: customer.created_at,
+            orders: Number(customer.orders ?? 0),
+            totalSpent: Number(customer.totalSpent ?? 0),
+          }))
+        : [];
+
+      setCustomers(normalizedCustomers);
     } catch (error) {
       console.error('Customers error:', error);
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     loadCustomers();
-  }, []);
+
+    const interval = setInterval(() => {
+      loadCustomers();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [loadCustomers]);
 
   return (
     <div>
-      <h1 className="font-display text-3xl mb-8">Customers</h1>
+      <h1 className="font-display text-3xl mb-8">
+        Customers
+      </h1>
 
       <div className="bg-cream border border-obsidian/10 overflow-x-auto">
         <table className="w-full text-sm">
@@ -65,38 +86,48 @@ export default function AdminCustomersPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-obsidian/40">
+                <td
+                  colSpan={5}
+                  className="p-8 text-center text-obsidian/40"
+                >
                   Loading customers...
                 </td>
               </tr>
             ) : customers.length === 0 ? (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-obsidian/40">
+                <td
+                  colSpan={5}
+                  className="p-8 text-center text-obsidian/40"
+                >
                   No customers yet.
                 </td>
               </tr>
             ) : (
-              customers.map((c) => (
+              customers.map((customer) => (
                 <tr
-                  key={c.id}
+                  key={customer.id}
                   className="border-b border-obsidian/5 last:border-0 hover:bg-blush/30"
                 >
-                  <td className="p-4 font-medium">{c.full_name}</td>
-
-                  <td className="p-4 text-obsidian/60">
-                    {c.email}
-                  </td>
-
-                  <td className="p-4">
-                    {c.orders}
-                  </td>
-
-                  <td className="p-4">
-                    ${c.totalSpent.toFixed(2)}
+                  <td className="p-4 font-medium">
+                    {customer.full_name}
                   </td>
 
                   <td className="p-4 text-obsidian/60">
-                    {new Date(c.created_at).toLocaleDateString()}
+                    {customer.email}
+                  </td>
+
+                  <td className="p-4">
+                    {customer.orders}
+                  </td>
+
+                  <td className="p-4">
+                    ${customer.totalSpent.toFixed(2)}
+                  </td>
+
+                  <td className="p-4 text-obsidian/60">
+                    {new Date(
+                      customer.created_at
+                    ).toLocaleDateString()}
                   </td>
                 </tr>
               ))
