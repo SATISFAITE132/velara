@@ -45,6 +45,10 @@ console.log(
   'SERVICE KEY LENGTH:',
   process.env.SUPABASE_SERVICE_ROLE_KEY?.length ?? 0
 );
+console.log(
+  'CUSTOMER IDS:',
+  customers?.map((c) => c.id)
+);
 
  
 const customersWithStats = (customers ?? []).map((customer) => {
