@@ -41,6 +41,10 @@ console.log(
   'SUPABASE PROJECT:',
   process.env.NEXT_PUBLIC_SUPABASE_URL
 );
+console.log(
+  'SERVICE KEY LENGTH:',
+  process.env.SUPABASE_SERVICE_ROLE_KEY?.length ?? 0
+);
 
  
 const customersWithStats = (customers ?? []).map((customer) => {
