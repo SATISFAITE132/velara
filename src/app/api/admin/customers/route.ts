@@ -49,7 +49,14 @@ console.log(
   'CUSTOMER IDS:',
   customers?.map((c) => c.id)
 );
+const { data: aichaTest, error: aichaTestError } = await supabase
+  .from('customers')
+  .select('id, full_name, email')
+  .eq('id', '932d37ec-cd1b-4b16-a13f-94b0df203adf')
+  .maybeSingle();
 
+console.log('AICHA DIRECT TEST:', aichaTest);
+console.log('AICHA DIRECT ERROR:', aichaTestError);
  
 const customersWithStats = (customers ?? []).map((customer) => {
       const customerOrders = (orders ?? []).filter(
