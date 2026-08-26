@@ -1,5 +1,4 @@
-
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -14,10 +13,11 @@ import RevealSection from '@/components/RevealSection';
 import { createClient } from '@/lib/supabase/client';
 
 export default function HomePage() {
-  const supabase = createClient();
   const [products, setProducts] = useState<any[]>([]);
 
   useEffect(() => {
+    const supabase = createClient();
+
     async function loadProducts() {
       const { data, error } = await supabase
         .from('products')
@@ -47,10 +47,8 @@ export default function HomePage() {
 
   return (
     <>
-      {/* HERO */}
       <HeroSection />
 
-      {/* BESTSELLERS */}
       <section className="container-vl py-24">
         <RevealSection>
           <p className="eyebrow text-center">Most Loved</p>
@@ -79,7 +77,6 @@ export default function HomePage() {
 
       <GoldPour className="py-4" />
 
-      {/* OUR STORY */}
       <section
         id="story"
         className="bg-obsidian text-cream py-28"
@@ -129,7 +126,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* VELARA EXPERIENCE */}
       <section className="container-vl py-28">
         <RevealSection>
           <p className="eyebrow text-center">
@@ -178,10 +174,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* WHY VELARA */}
       <TestimonialMarquee />
 
-      {/* NEWSLETTER */}
       <section
         className="bg-blush py-24"
         id="contact"
@@ -224,4 +218,3 @@ export default function HomePage() {
     </>
   );
 }
-

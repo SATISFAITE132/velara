@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Minus, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
@@ -54,7 +54,7 @@ export default function CartDrawer() {
                         <span className="px-3 text-sm">{l.quantity}</span>
                         <button className="p-1.5" onClick={() => setQuantity(l.productId, l.quantity + 1)} aria-label="Increase quantity"><Plus size={12} /></button>
                       </div>
-                      <p className="text-sm font-medium">${(l.price * l.quantity).toFixed(2)}</p>
+                      <p className="text-sm font-medium">€{(l.price * l.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 </div>
@@ -65,7 +65,7 @@ export default function CartDrawer() {
               <div className="p-6 border-t border-obsidian/10 space-y-4">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal</span>
-                  <span className="font-medium">${subtotal().toFixed(2)}</span>
+                  <span className="font-medium">€{subtotal().toFixed(2)}</span>
                 </div>
                 <p className="text-xs text-obsidian/50">Shipping and taxes calculated at checkout.</p>
                 <Link href="/checkout" onClick={close} className="btn-primary w-full">Checkout</Link>
@@ -78,3 +78,4 @@ export default function CartDrawer() {
     </AnimatePresence>
   );
 }
+

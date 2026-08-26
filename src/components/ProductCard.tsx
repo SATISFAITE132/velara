@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -7,6 +7,8 @@ import { Product } from '@/lib/types';
 import { useCart } from '@/store/cart';
 import { Star } from 'lucide-react';
 
+import { useEffect, useState } from 'react';
+import { getCurrencySymbol } from '@/lib/currency';
 export default function ProductCard({
   product,
   index = 0,
@@ -14,9 +16,30 @@ export default function ProductCard({
   product: Product;
   index?: number;
 }) {
-  const addItem = useCart((s) => s.addItem);
+const addItem = useCart((s) => s.addItem);
 
-  return (
+const [currency, setCurrency] = useState('EUR');
+
+useEffect(() => {
+  async function loadCurrency() {
+    try {
+      const response = await fetch('/api/settings');
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+
+      setCurrency(data.currency ?? 'USD');
+    } catch (error) {
+      console.error('Currency load error:', error);
+    }
+  }
+
+  loadCurrency();
+}, []);
+
+return (
+  
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -86,12 +109,12 @@ export default function ProductCard({
 
           <div className="flex items-center gap-2 mt-2">
             <span className="font-medium">
-              ${product.price}
+              {getCurrencySymbol(currency as any)}{product.price}
             </span>
 
             {product.compareAtPrice && (
               <span className="text-sm text-obsidian/40 line-through">
-                ${product.compareAtPrice}
+                {getCurrencySymbol(currency as any)}{product.compareAtPrice}
               </span>
             )}
           </div>
@@ -110,3 +133,4 @@ export default function ProductCard({
     </motion.div>
   );
 }
+

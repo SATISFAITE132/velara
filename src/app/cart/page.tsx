@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Minus, Plus, Trash2 } from 'lucide-react';
@@ -34,7 +34,7 @@ export default function CartPage() {
                     <p className="font-display text-lg">{l.name}</p>
                     <p className="text-sm text-obsidian/50 mt-1">{l.size}</p>
                   </div>
-                  <p className="font-medium">${(l.price * l.quantity).toFixed(2)}</p>
+                  <p className="font-medium">€{(l.price * l.quantity).toFixed(2)}</p>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center border border-obsidian/20">
@@ -54,16 +54,16 @@ export default function CartPage() {
         <div className="bg-blush/60 p-8 h-fit">
           <h2 className="font-display text-xl mb-6">Order Summary</h2>
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between"><span>Subtotal</span><span>${subtotal().toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Subtotal</span><span>€{subtotal().toFixed(2)}</span></div>
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+              <span>{shipping === 0 ? 'Free' : `€${shipping.toFixed(2)}`}</span>
             </div>
-            {shipping > 0 && <p className="text-xs text-obsidian/50">Free shipping on orders over $75.</p>}
+            {shipping > 0 && <p className="text-xs text-obsidian/50">Free shipping on orders over €75.</p>}
           </div>
           <div className="border-t border-obsidian/15 mt-4 pt-4 flex justify-between font-medium">
             <span>Total</span>
-            <span>${(subtotal() + shipping).toFixed(2)}</span>
+            <span>€{(subtotal() + shipping).toFixed(2)}</span>
           </div>
           <Link href="/checkout" className="btn-primary w-full mt-6">Proceed to Checkout</Link>
           <Link href="/shop" className="block text-center text-xs tracking-widest2 uppercase mt-4 text-obsidian/60 hover:text-obsidian">Continue Shopping</Link>
@@ -72,3 +72,6 @@ export default function CartPage() {
     </div>
   );
 }
+
+
+

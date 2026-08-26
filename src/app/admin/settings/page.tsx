@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 
@@ -42,9 +42,7 @@ export default function AdminSettingsPage() {
           support_email: data.support_email ?? '',
           currency: data.currency ?? 'USD',
           flat_rate: Number(data.flat_rate ?? 0),
-          free_shipping_threshold: Number(
-            data.free_shipping_threshold ?? 0
-          ),
+          free_shipping_threshold: Number(data.free_shipping_threshold ?? 0),
         });
       } catch (error) {
         console.error('Settings load error:', error);
@@ -81,17 +79,14 @@ export default function AdminSettingsPage() {
           support_email: settings.support_email,
           currency: settings.currency,
           flat_rate: settings.flat_rate,
-          free_shipping_threshold:
-            settings.free_shipping_threshold,
+          free_shipping_threshold: settings.free_shipping_threshold,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data?.error || 'Could not save settings'
-        );
+        throw new Error(data?.error || 'Could not save settings');
       }
 
       setSettings({
@@ -100,9 +95,7 @@ export default function AdminSettingsPage() {
         support_email: data.support_email ?? '',
         currency: data.currency ?? 'USD',
         flat_rate: Number(data.flat_rate ?? 0),
-        free_shipping_threshold: Number(
-          data.free_shipping_threshold ?? 0
-        ),
+        free_shipping_threshold: Number(data.free_shipping_threshold ?? 0),
       });
 
       setSaved(true);
@@ -137,6 +130,13 @@ export default function AdminSettingsPage() {
     );
   }
 
+  const currencySymbol =
+    settings.currency === 'EUR'
+      ? '€'
+      : settings.currency === 'GBP'
+        ? '£'
+        : '$';
+
   return (
     <div className="max-w-2xl">
       <h1 className="font-display text-3xl mb-8">
@@ -158,10 +158,7 @@ export default function AdminSettingsPage() {
               <input
                 value={settings.store_name}
                 onChange={(e) =>
-                  updateField(
-                    'store_name',
-                    e.target.value
-                  )
+                  updateField('store_name', e.target.value)
                 }
                 className="input-field mt-1"
               />
@@ -176,10 +173,7 @@ export default function AdminSettingsPage() {
                 type="email"
                 value={settings.support_email}
                 onChange={(e) =>
-                  updateField(
-                    'support_email',
-                    e.target.value
-                  )
+                  updateField('support_email', e.target.value)
                 }
                 className="input-field mt-1"
               />
@@ -193,22 +187,13 @@ export default function AdminSettingsPage() {
               <select
                 value={settings.currency}
                 onChange={(e) =>
-                  updateField(
-                    'currency',
-                    e.target.value
-                  )
+                  updateField('currency', e.target.value)
                 }
                 className="input-field mt-1"
               >
-                <option value="USD">
-                  USD ($)
-                </option>
-                <option value="EUR">
-                  EUR (€)
-                </option>
-                <option value="GBP">
-                  GBP (£)
-                </option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
               </select>
             </div>
           </div>
@@ -222,7 +207,7 @@ export default function AdminSettingsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs text-obsidian/50 uppercase tracking-wide">
-                Flat Rate ($)
+                Flat Rate ({currencySymbol})
               </label>
 
               <input
@@ -231,10 +216,7 @@ export default function AdminSettingsPage() {
                 step="0.01"
                 value={settings.flat_rate}
                 onChange={(e) =>
-                  updateField(
-                    'flat_rate',
-                    Number(e.target.value)
-                  )
+                  updateField('flat_rate', Number(e.target.value))
                 }
                 className="input-field mt-1"
               />
@@ -242,16 +224,14 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="text-xs text-obsidian/50 uppercase tracking-wide">
-                Free Shipping Threshold ($)
+                Free Shipping Threshold ({currencySymbol})
               </label>
 
               <input
                 type="number"
                 min="0"
                 step="0.01"
-                value={
-                  settings.free_shipping_threshold
-                }
+                value={settings.free_shipping_threshold}
                 onChange={(e) =>
                   updateField(
                     'free_shipping_threshold',

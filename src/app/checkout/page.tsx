@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -285,7 +285,7 @@ export default function CheckoutPage() {
           >
             {submitting
               ? 'Placing Order...'
-              : `Place Order — $${total.toFixed(2)}`}
+              : `Place Order — €${total.toFixed(2)}`}
           </button>
         </div>
 
@@ -312,11 +312,11 @@ export default function CheckoutPage() {
 
                 <div className="flex-1 text-sm">
                   <p>
-                    {l.name} × {l.quantity}
+                    {l.name} Ã— {l.quantity}
                   </p>
 
                   <p className="text-obsidian/50">
-                    ${(l.price * l.quantity).toFixed(2)}
+                    €{(l.price * l.quantity).toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -326,7 +326,7 @@ export default function CheckoutPage() {
           <div className="border-t border-obsidian/15 mt-6 pt-4 space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${subtotal().toFixed(2)}</span>
+              <span>€{subtotal().toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between">
@@ -334,13 +334,13 @@ export default function CheckoutPage() {
               <span>
                 {shipping === 0
                   ? 'Free'
-                  : `$${shipping.toFixed(2)}`}
+                  : `€${shipping.toFixed(2)}`}
               </span>
             </div>
 
             <div className="flex justify-between font-medium text-base pt-2">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>€{total.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -348,3 +348,5 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+

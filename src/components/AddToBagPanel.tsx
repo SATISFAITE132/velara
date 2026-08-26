@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -23,8 +23,10 @@ export default function AddToBagPanel({ product }: { product: Product }) {
           toast.success(`${product.name} added to your bag`);
         }}
       >
-        Add to Bag — ${(product.price * qty).toFixed(2)}
+        Add to Bag — €{(product.price * qty).toFixed(2)}
       </button>
     </div>
   );
 }
+
+

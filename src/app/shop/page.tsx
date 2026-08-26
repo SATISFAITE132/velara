@@ -1,8 +1,7 @@
-'use client';
+﻿'use client';
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-
 import { createClient } from '@/lib/supabase/client';
 import ProductCard from '@/components/ProductCard';
 import RevealSection from '@/components/RevealSection';
@@ -11,39 +10,40 @@ const CATEGORIES = ['All', 'Elixirs', 'Serums', 'Treatments', 'Sets'] as const;
 const SORTS = ['Featured', 'Price: Low to High', 'Price: High to Low', 'Top Rated'] as const;
 
 function ShopContent() {
-  const supabase = createClient();
-  const [products, setProducts] = useState<any[]>([]);
-  useEffect(() => {
-  async function loadProducts() {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*');
-
-    if (error) {
-      console.error('Products error:', error);
-      return;
-    }
-
-    setProducts(
-  (data || []).map((p) => ({
-    ...p,
-    compareAtPrice: p.compare_at_price,
-    heroImage: p.hero_image,
-    reviewCount: p.review_count,
-    howToUse: p.how_to_use,
-  }))
-);
-  }
-
-  loadProducts();
-}, []);
   const params = useSearchParams();
 
-  const [category, setCategory] = useState<(typeof CATEGORIES)[number]>(
-    (params.get('category') as any) || 'All'
+  const [products, setProducts] = useState<any[]>([]);
+  const [category, setCategory] = useState<string>(
+    params.get('category') || 'All'
   );
+  const [sort, setSort] = useState<string>('Featured');
 
-  const [sort, setSort] = useState<(typeof SORTS)[number]>('Featured');
+  useEffect(() => {
+    const supabase = createClient();
+
+    async function loadProducts() {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*');
+
+      if (error) {
+        console.error('Products error:', error);
+        return;
+      }
+
+      const mappedProducts = (data || []).map((p) => ({
+        ...p,
+        compareAtPrice: p.compare_at_price,
+        heroImage: p.hero_image,
+        reviewCount: p.review_count,
+        howToUse: p.how_to_use,
+      }));
+
+      setProducts(mappedProducts);
+    }
+
+    loadProducts();
+  }, []);
 
   const list = useMemo(() => {
     let items =
@@ -82,11 +82,11 @@ function ShopContent() {
             <button
               key={c}
               onClick={() => setCategory(c)}
-              className={`px-4 py-2 text-xs tracking-widest2 uppercase border transition-colors ${
+              className={
                 category === c
-                  ? 'bg-obsidian text-cream border-obsidian'
-                  : 'border-obsidian/20 hover:border-obsidian'
-              }`}
+                  ? 'px-4 py-2 text-xs tracking-widest2 uppercase border bg-obsidian text-cream border-obsidian'
+                  : 'px-4 py-2 text-xs tracking-widest2 uppercase border border-obsidian/20 hover:border-obsidian'
+              }
             >
               {c}
             </button>
@@ -95,18 +95,24 @@ function ShopContent() {
 
         <select
           value={sort}
-          onChange={(e) => setSort(e.target.value as any)}
+          onChange={(e) => setSort(e.target.value)}
           className="bg-cream border border-obsidian/20 px-4 py-2 text-xs tracking-widest2 uppercase focus:outline-none"
         >
           {SORTS.map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-14 mt-14">
         {list.map((p, i) => (
-          <ProductCard key={p.id} product={p} index={i} />
+          <ProductCard
+            key={p.id}
+            product={p}
+            index={i}
+          />
         ))}
       </div>
 

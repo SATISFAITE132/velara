@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+﻿import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import ProductGallery from '@/components/ProductGallery';
 import AddToBagPanel from '@/components/AddToBagPanel';
@@ -154,18 +154,18 @@ console.log('STORY:', productData.story);
             </div>
 
             <span className="text-sm text-obsidian/50">
-              {product.rating} · {product.reviewCount} reviews
+              {product.rating} Â· {product.reviewCount} reviews
             </span>
           </div>
 
           <div className="flex items-baseline gap-3 mt-6">
             <span className="text-2xl font-medium">
-              ${product.price}
+              €{product.price}
             </span>
 
             {product.compareAtPrice && (
               <span className="text-obsidian/40 line-through">
-                ${product.compareAtPrice}
+                €{product.compareAtPrice}
               </span>
             )}
 
@@ -188,7 +188,7 @@ console.log('STORY:', productData.story);
 
               <p className="text-sm text-obsidian/60">
                 {product.ingredients.length > 0
-                  ? product.ingredients.join(' · ')
+                  ? product.ingredients.join(' Â· ')
                   : 'Details coming soon.'}
               </p>
             </div>
@@ -272,7 +272,7 @@ console.log('STORY:', productData.story);
               </p>
 
               <p className="text-xs text-obsidian/40 mt-2">
-                {r.author} · {r.date}
+                {r.author} Â· {r.date}
               </p>
             </div>
           ))}
