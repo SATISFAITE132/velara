@@ -18,7 +18,9 @@ export default function AdminCustomersPage() {
 
   async function loadCustomers() {
     try {
-      const response = await fetch('/api/admin/customers');
+      const response = await fetch('/api/admin/customers', {
+  cache: 'no-store',
+});
 
       if (!response.ok) {
         throw new Error('Could not load customers');
