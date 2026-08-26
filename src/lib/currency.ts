@@ -1,13 +1,14 @@
-﻿export type Currency = 'USD' | 'EUR' | 'GBP';
+﻿export type Currency = 'MAD';
 
-export function getCurrencySymbol(currency: Currency) {
-  switch (currency) {
-    case 'EUR':
-      return '€';
-    case 'GBP':
-      return '£';
-    case 'USD':
-    default:
-      return '$';
-  }
+export function getCurrencySymbol(
+  currency: Currency = 'MAD'
+): string {
+  return 'د.م.';
+}
+
+export function formatPrice(
+  amount: number,
+  currency: Currency = 'MAD'
+): string {
+  return `${Number(amount).toFixed(2)} د.م.`;
 }

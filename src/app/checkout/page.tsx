@@ -1,352 +1,396 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useCart } from '@/store/cart';
-import { toast } from 'sonner';
-
-const checkoutSchema = z.object({
-  email: z.string().email('Enter a valid email'),
-  fullName: z.string().min(2, 'Enter your full name'),
-  line1: z.string().min(3, 'Enter your address'),
-  city: z.string().min(2, 'Enter your city'),
-  state: z.string().min(1, 'Required'),
-  postalCode: z.string().min(3, 'Required'),
-  country: z.string().min(2, 'Required'),
-  phone: z.string().min(6, 'Enter a valid phone number'),
-  paymentMethod: z.enum(['cod', 'card']),
-  cardNumber: z.string().optional(),
-  cardExpiry: z.string().optional(),
-  cardCvc: z.string().optional(),
-});
-
-type CheckoutForm = z.infer<typeof checkoutSchema>;
+import { formatPrice } from '@/lib/currency';
 
 export default function CheckoutPage() {
-  const { lines, subtotal, clear } = useCart();
-  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
+  const { lines, subtotal, clear } = useCart();
 
-  const shipping = subtotal() < 75 ? 6.5 : 0;
-  const total = subtotal() + shipping;
+  const [flatRate, setFlatRate] = useState(6.5);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(75);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<CheckoutForm>({
-    resolver: zodResolver(checkoutSchema),
-    defaultValues: {
-      country: 'United States',
-      paymentMethod: 'cod',
-    },
-  });
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('Morocco');
 
-  const paymentMethod = watch('paymentMethod');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const onSubmit = async (data: CheckoutForm) => {
-    setSubmitting(true);
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const response = await fetch('/api/settings', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+
+        setFlatRate(Number(data.flat_rate ?? 6.5));
+        setFreeShippingThreshold(
+          Number(data.free_shipping_threshold ?? 75)
+        );
+      } catch (error) {
+        console.error('Store settings load error:', error);
+      }
+    }
+
+    loadSettings();
+  }, []);
+
+  const currentSubtotal = subtotal();
+
+  const shipping =
+    currentSubtotal < freeShippingThreshold
+      ? flatRate
+      : 0;
+
+  const total = currentSubtotal + shipping;
+
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+
+    setError('');
+
+    if (lines.length === 0) {
+      setError('Your bag is empty.');
+      return;
+    }
+
+    if (!fullName.trim()) {
+      setError('Please enter your full name.');
+      return;
+    }
+
+    if (!email.trim()) {
+      setError('Please enter your email.');
+      return;
+    }
+
+    if (!phone.trim()) {
+      setError('Please enter your phone number.');
+      return;
+    }
+
+    if (!address.trim()) {
+      setError('Please enter your address.');
+      return;
+    }
+
+    if (!city.trim()) {
+      setError('Please enter your city.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const res = await fetch('/api/checkout', {
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: data.email,
+          email: email.trim(),
           items: lines,
-          subtotal: subtotal(),
+          subtotal: currentSubtotal,
           shipping,
+          discount: 0,
           total,
-          paymentMethod: data.paymentMethod,
+          paymentMethod: 'cash_on_delivery',
           shippingAddress: {
-            fullName: data.fullName,
-            line1: data.line1,
-            city: data.city,
-            state: data.state,
-            postalCode: data.postalCode,
-            country: data.country,
-            phone: data.phone,
+            fullName: fullName.trim(),
+            line1: address.trim(),
+            line2: '',
+            city: city.trim(),
+            state: '',
+            postalCode: '',
+            country: country.trim(),
+            phone: phone.trim(),
           },
         }),
       });
 
-      const result = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
-        throw new Error(result?.error || 'Could not place order');
+      if (!response.ok) {
+        throw new Error(
+          data?.error || 'Could not place order'
+        );
       }
 
       clear();
-      router.push(`/thank-you?order=${result.orderNumber}`);
+
+      router.push(
+        `/thank-you?order=${encodeURIComponent(
+          data.orderNumber
+        )}`
+      );
     } catch (error) {
       console.error('Checkout error:', error);
 
-      toast.error(
+      setError(
         error instanceof Error
           ? error.message
-          : 'Something went wrong placing your order. Please try again.'
+          : 'Could not place order'
       );
-    } finally {
-      setSubmitting(false);
+
+      setLoading(false);
     }
-  };
+  }
 
   if (lines.length === 0) {
     return (
       <div className="container-vl py-32 text-center">
         <h1 className="font-display text-3xl">
-          Nothing to check out yet
+          Your bag is empty
         </h1>
 
         <p className="text-obsidian/60 mt-3">
-          Add a product to your bag first.
+          Add a product to your bag before checkout.
         </p>
+
+        <a
+          href="/shop"
+          className="btn-primary inline-flex mt-8"
+        >
+          Shop Now
+        </a>
       </div>
     );
   }
 
   return (
     <div className="container-vl py-16">
-      <h1 className="font-display text-3xl md:text-4xl mb-12">
-        Checkout
-      </h1>
+      <div className="max-w-5xl mx-auto">
+        <h1 className="font-display text-3xl md:text-4xl mb-12">
+          Checkout
+        </h1>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="grid lg:grid-cols-3 gap-12"
-      >
-        <div className="lg:col-span-2 space-y-10">
-          <section>
-            <h2 className="font-display text-xl mb-4">
-              Contact
-            </h2>
+        <form
+          onSubmit={handleSubmit}
+          className="grid lg:grid-cols-3 gap-12"
+        >
+          <div className="lg:col-span-2 space-y-8">
+            <section>
+              <h2 className="font-display text-xl mb-5">
+                Contact Information
+              </h2>
 
-            <input
-              {...register('email')}
-              placeholder="Email address"
-              className="input-field"
-            />
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs text-obsidian/50 uppercase tracking-wide">
+                    Full Name
+                  </label>
 
-            {errors.email && (
-              <p className="error-text">
-                {errors.email.message}
-              </p>
-            )}
-          </section>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(event) =>
+                      setFullName(event.target.value)
+                    }
+                    className="input-field mt-1"
+                    placeholder="Your full name"
+                    autoComplete="name"
+                  />
+                </div>
 
-          <section>
-            <h2 className="font-display text-xl mb-4">
-              Shipping Address
-            </h2>
+                <div>
+                  <label className="text-xs text-obsidian/50 uppercase tracking-wide">
+                    Email
+                  </label>
 
-            <div className="grid sm:grid-cols-2 gap-4">
-              <input
-                {...register('fullName')}
-                placeholder="Full name"
-                className="input-field sm:col-span-2"
-              />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(event) =>
+                      setEmail(event.target.value)
+                    }
+                    className="input-field mt-1"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                  />
+                </div>
 
-              <input
-                {...register('line1')}
-                placeholder="Address"
-                className="input-field sm:col-span-2"
-              />
+                <div>
+                  <label className="text-xs text-obsidian/50 uppercase tracking-wide">
+                    Phone
+                  </label>
 
-              <input
-                {...register('city')}
-                placeholder="City"
-                className="input-field"
-              />
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(event) =>
+                      setPhone(event.target.value)
+                    }
+                    className="input-field mt-1"
+                    placeholder="+212 6 00 00 00 00"
+                    autoComplete="tel"
+                  />
+                </div>
+              </div>
+            </section>
 
-              <input
-                {...register('state')}
-                placeholder="State / Province"
-                className="input-field"
-              />
+            <section>
+              <h2 className="font-display text-xl mb-5">
+                Shipping Address
+              </h2>
 
-              <input
-                {...register('postalCode')}
-                placeholder="Postal Code"
-                className="input-field"
-              />
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs text-obsidian/50 uppercase tracking-wide">
+                    Address
+                  </label>
 
-              <input
-                {...register('country')}
-                placeholder="Country"
-                className="input-field"
-              />
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(event) =>
+                      setAddress(event.target.value)
+                    }
+                    className="input-field mt-1"
+                    placeholder="Street address"
+                    autoComplete="street-address"
+                  />
+                </div>
 
-              <input
-                {...register('phone')}
-                placeholder="Phone"
-                className="input-field sm:col-span-2"
-              />
-            </div>
+                <div>
+                  <label className="text-xs text-obsidian/50 uppercase tracking-wide">
+                    City
+                  </label>
 
-            {(errors.fullName ||
-              errors.line1 ||
-              errors.city ||
-              errors.state ||
-              errors.postalCode ||
-              errors.country ||
-              errors.phone) && (
-              <p className="error-text">
-                Please complete all required shipping fields.
-              </p>
-            )}
-          </section>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(event) =>
+                      setCity(event.target.value)
+                    }
+                    className="input-field mt-1"
+                    placeholder="City"
+                    autoComplete="address-level2"
+                  />
+                </div>
 
-          <section>
-            <h2 className="font-display text-xl mb-4">
-              Payment
-            </h2>
+                <div>
+                  <label className="text-xs text-obsidian/50 uppercase tracking-wide">
+                    Country
+                  </label>
 
-            <div className="space-y-4">
-              <label className="flex items-start gap-3 border border-obsidian/20 p-4 cursor-pointer">
-                <input
-                  type="radio"
-                  value="cod"
-                  {...register('paymentMethod')}
-                  className="mt-1"
-                />
+                  <input
+                    type="text"
+                    value={country}
+                    onChange={(event) =>
+                      setCountry(event.target.value)
+                    }
+                    className="input-field mt-1"
+                    autoComplete="country-name"
+                  />
+                </div>
+              </div>
+            </section>
 
-                <span>
-                  <span className="block font-medium">
-                    Cash on Delivery
-                  </span>
+            <section>
+              <h2 className="font-display text-xl mb-5">
+                Payment
+              </h2>
 
-                  <span className="block text-xs text-obsidian/50 mt-1">
-                    Pay when your order is delivered.
-                  </span>
-                </span>
-              </label>
-
-              <label className="flex items-start gap-3 border border-obsidian/20 p-4 cursor-pointer">
-                <input
-                  type="radio"
-                  value="card"
-                  {...register('paymentMethod')}
-                  className="mt-1"
-                />
-
-                <span>
-                  <span className="block font-medium">
-                    Pay by Card
-                  </span>
-
-                  <span className="block text-xs text-obsidian/50 mt-1">
-                    Pay securely by credit or debit card.
-                  </span>
-                </span>
-              </label>
-            </div>
-
-            {paymentMethod === 'card' && (
-              <div className="mt-6 space-y-4">
-                <p className="text-xs text-obsidian/50">
-                  Payments are processed securely. Card details
-                  are never stored on our servers.
+              <div className="border border-obsidian/15 p-5">
+                <p className="font-medium">
+                  Cash on Delivery
                 </p>
 
-                <input
-                  {...register('cardNumber')}
-                  placeholder="Card number"
-                  className="input-field"
-                />
+                <p className="text-sm text-obsidian/60 mt-1">
+                  Pay when your order arrives.
+                </p>
+              </div>
+            </section>
 
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <input
-                    {...register('cardExpiry')}
-                    placeholder="MM/YY"
-                    className="input-field"
-                  />
-
-                  <input
-                    {...register('cardCvc')}
-                    placeholder="CVC"
-                    className="input-field"
-                  />
-                </div>
+            {error && (
+              <div className="border border-red-300 bg-red-50 p-4 text-sm text-red-700">
+                {error}
               </div>
             )}
-          </section>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="btn-primary w-full disabled:opacity-50"
-          >
-            {submitting
-              ? 'Placing Order...'
-              : `Place Order — €${total.toFixed(2)}`}
-          </button>
-        </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full disabled:opacity-50"
+            >
+              {loading
+                ? 'Placing Order...'
+                : 'Place Order'}
+            </button>
+          </div>
 
-        <div className="bg-blush/60 p-8 h-fit">
-          <h2 className="font-display text-xl mb-6">
-            Order Summary
-          </h2>
+          <aside className="bg-blush/60 p-8 h-fit">
+            <h2 className="font-display text-xl mb-6">
+              Order Summary
+            </h2>
 
-          <div className="space-y-4">
-            {lines.map((l) => (
-              <div
-                key={l.productId}
-                className="flex gap-3"
-              >
-                <div className="relative w-14 h-16 bg-cream shrink-0 overflow-hidden">
-                  <Image
-                    src={l.image}
-                    alt={l.name}
-                    fill
-                    className="object-cover"
-                    sizes="56px"
-                  />
+            <div className="space-y-4 text-sm">
+              {lines.map((line) => (
+                <div
+                  key={line.productId}
+                  className="flex justify-between gap-4"
+                >
+                  <div>
+                    <p>{line.name}</p>
+
+                    <p className="text-xs text-obsidian/50 mt-1">
+                      {line.quantity} × {formatPrice(line.price)}
+                    </p>
+                  </div>
+
+                  <p className="shrink-0">
+                    {formatPrice(
+                      line.price * line.quantity
+                    )}
+                  </p>
+                </div>
+              ))}
+
+              <div className="border-t border-obsidian/15 pt-4 space-y-3">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+
+                  <span>
+                    {formatPrice(currentSubtotal)}
+                  </span>
                 </div>
 
-                <div className="flex-1 text-sm">
-                  <p>
-                    {l.name} Ã— {l.quantity}
-                  </p>
+                <div className="flex justify-between">
+                  <span>Shipping</span>
 
-                  <p className="text-obsidian/50">
-                    €{(l.price * l.quantity).toFixed(2)}
-                  </p>
+                  <span>
+                    {shipping === 0
+                      ? 'Free'
+                      : formatPrice(shipping)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between border-t border-obsidian/15 pt-4 font-medium">
+                  <span>Total</span>
+
+                  <span>
+                    {formatPrice(total)}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="border-t border-obsidian/15 mt-6 pt-4 space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>€{subtotal().toFixed(2)}</span>
             </div>
-
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>
-                {shipping === 0
-                  ? 'Free'
-                  : `€${shipping.toFixed(2)}`}
-              </span>
-            </div>
-
-            <div className="flex justify-between font-medium text-base pt-2">
-              <span>Total</span>
-              <span>€{total.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-      </form>
+          </aside>
+        </form>
+      </div>
     </div>
   );
 }
-
-

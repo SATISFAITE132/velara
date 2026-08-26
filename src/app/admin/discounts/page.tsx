@@ -152,10 +152,10 @@ export default function AdminDiscountsPage() {
                   </td>
 
                   <td className="p-4">
-                    {d.type === 'percentage'
-                      ? `${d.value}%`
-                      : `$${d.value}`}
-                  </td>
+  {d.type === 'percentage'
+    ? `${d.value}%`
+    : `${d.value.toFixed(2)} د.م.`}
+</td>
 
                   <td className="p-4">
                     {d.usage_count}

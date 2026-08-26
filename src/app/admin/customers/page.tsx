@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { formatPrice } from '@/lib/currency';
 
 type Customer = {
   id: string;
@@ -121,7 +122,7 @@ export default function AdminCustomersPage() {
                   </td>
 
                   <td className="p-4">
-                    ${customer.totalSpent.toFixed(2)}
+                    {formatPrice(customer.totalSpent)}
                   </td>
 
                   <td className="p-4 text-obsidian/60">

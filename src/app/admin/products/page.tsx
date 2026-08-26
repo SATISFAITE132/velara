@@ -218,11 +218,11 @@ export default function AdminProductsPage() {
                     </td>
 
                     <td className="p-4">
-                      ${Number(p.price).toFixed(2)}
+                      {Number(p.price).toFixed(2)} د.م.
 
                       {p.compare_at_price && (
                         <span className="ml-2 text-xs line-through text-obsidian/40">
-                          ${Number(p.compare_at_price).toFixed(2)}
+                          {Number(p.compare_at_price).toFixed(2)} د.م.
                         </span>
                       )}
                     </td>
@@ -552,7 +552,7 @@ function ProductFormModal({
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs text-obsidian/50 uppercase tracking-wide">
-                Price ($)
+                Price (د.م.)
               </label>
 
               <input
@@ -569,7 +569,7 @@ function ProductFormModal({
 
             <div>
               <label className="text-xs text-obsidian/50 uppercase tracking-wide">
-                Compare-at Price ($)
+                Compare-at Price (د.م.)
               </label>
 
               <input

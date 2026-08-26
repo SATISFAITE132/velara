@@ -16,17 +16,17 @@ export async function GET() {
     if (error) {
       console.error('Public settings error:', error);
 
-      return NextResponse.json({ currency: 'EUR' });
+      return NextResponse.json({ currency: 'MAD' });
     }
 
     return NextResponse.json({
-      currency: data?.currency ?? 'EUR',
+      currency: data?.currency ?? 'MAD',
     });
   } catch (error) {
     console.error('Public settings API error:', error);
 
     return NextResponse.json({
-      currency: 'EUR',
+      currency: 'MAD',
     });
   }
 }

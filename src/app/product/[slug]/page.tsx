@@ -6,6 +6,7 @@ import ProductCard from '@/components/ProductCard';
 import RevealSection from '@/components/RevealSection';
 import { Star } from 'lucide-react';
 import type { Product, Review } from '@/lib/types';
+import { getCurrencySymbol } from '@/lib/currency';
 
 function parseArray(value: any): string[] {
   if (Array.isArray(value)) {
@@ -90,6 +91,15 @@ export default async function ProductPage({
   }
 
   const product = normalizeProduct(productData);
+
+  const { data: settingsData } = await supabase
+    .from('store_settings')
+    .select('currency')
+    .eq('id', 1)
+    .single();
+
+  const currency = 'MAD';
+  const currencySymbol = getCurrencySymbol(currency);
   console.log('RAW PRODUCT:', productData);
 console.log('INGREDIENTS:', productData.ingredients);
 console.log('HOW TO USE:', productData.how_to_use);
@@ -160,12 +170,12 @@ console.log('STORY:', productData.story);
 
           <div className="flex items-baseline gap-3 mt-6">
             <span className="text-2xl font-medium">
-              €{product.price}
+              {currencySymbol}{product.price}
             </span>
 
             {product.compareAtPrice && (
               <span className="text-obsidian/40 line-through">
-                €{product.compareAtPrice}
+                {currencySymbol}{product.compareAtPrice}
               </span>
             )}
 
@@ -299,3 +309,6 @@ console.log('STORY:', productData.story);
     </div>
   );
 }
+
+
+

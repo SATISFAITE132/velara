@@ -170,7 +170,7 @@ setProducts(Array.isArray(productsData) ? productsData : []);
   const STAT_CARDS = [
     {
       label: 'Total Revenue',
-      value: `$${totalRevenue.toFixed(2)}`,
+      value: `${totalRevenue.toFixed(2)} د.م.`,
       delta: '',
       icon: DollarSign,
     },
@@ -188,7 +188,7 @@ setProducts(Array.isArray(productsData) ? productsData : []);
     },
     {
       label: 'Avg. Order Value',
-      value: `$${averageOrderValue.toFixed(2)}`,
+      value: `${averageOrderValue.toFixed(2)} د.م.`,
       delta: '',
       icon: TrendingUp,
     },
@@ -434,7 +434,7 @@ setProducts(Array.isArray(productsData) ? productsData : []);
                   </td>
 
                   <td className="p-4 text-right">
-                    ${Number(o.total || 0).toFixed(2)}
+                    {Number(o.total || 0).toFixed(2)} د.م.
                   </td>
                 </tr>
               ))}

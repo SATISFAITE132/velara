@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 type OrderItem = {
   name: string;
@@ -182,12 +183,10 @@ export default function AdminOrdersPage() {
                   key={o.id}
                   className="border-b border-obsidian/5 last:border-0 hover:bg-blush/30"
                 >
-                  {/* Order */}
                   <td className="p-4 font-medium">
                     {o.order_number}
                   </td>
 
-                  {/* Customer */}
                   <td className="p-4 text-obsidian/60">
                     <div className="font-medium text-obsidian">
                       {o.shipping_address?.fullName || '—'}
@@ -200,7 +199,6 @@ export default function AdminOrdersPage() {
                     </div>
                   </td>
 
-                  {/* Products */}
                   <td className="p-4">
                     {o.items.length > 0 ? (
                       <div className="space-y-2 min-w-[220px]">
@@ -217,8 +215,10 @@ export default function AdminOrdersPage() {
                               {item.size
                                 ? `${item.size} · `
                                 : ''}
-                              Qty: {item.quantity} · $
-                              {Number(item.price).toFixed(2)}
+                              Qty: {item.quantity} ·{' '}
+                              {formatPrice(
+                                Number(item.price)
+                              )}
                             </div>
                           </div>
                         ))}
@@ -230,7 +230,6 @@ export default function AdminOrdersPage() {
                     )}
                   </td>
 
-                  {/* Address */}
                   <td className="p-4 text-obsidian/60">
                     <div>
                       {o.shipping_address?.line1 || '—'}
@@ -251,14 +250,12 @@ export default function AdminOrdersPage() {
                     </div>
                   </td>
 
-                  {/* Date */}
                   <td className="p-4 text-obsidian/60">
                     {new Date(
                       o.created_at
                     ).toLocaleDateString()}
                   </td>
 
-                  {/* Status */}
                   <td className="p-4">
                     <select
                       value={o.status}
@@ -281,9 +278,8 @@ export default function AdminOrdersPage() {
                     </select>
                   </td>
 
-                  {/* Total */}
                   <td className="p-4 text-right font-medium">
-                    ${o.total.toFixed(2)}
+                    {formatPrice(o.total)}
                   </td>
                 </tr>
               ))}

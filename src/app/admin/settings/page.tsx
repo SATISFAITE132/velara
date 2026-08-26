@@ -16,7 +16,7 @@ export default function AdminSettingsPage() {
     id: 1,
     store_name: '',
     support_email: '',
-    currency: 'USD',
+    currency: 'MAD',
     flat_rate: 0,
     free_shipping_threshold: 0,
   });
@@ -40,9 +40,11 @@ export default function AdminSettingsPage() {
           id: data.id,
           store_name: data.store_name ?? '',
           support_email: data.support_email ?? '',
-          currency: data.currency ?? 'USD',
+          currency: 'MAD',
           flat_rate: Number(data.flat_rate ?? 0),
-          free_shipping_threshold: Number(data.free_shipping_threshold ?? 0),
+          free_shipping_threshold: Number(
+            data.free_shipping_threshold ?? 0
+          ),
         });
       } catch (error) {
         console.error('Settings load error:', error);
@@ -77,25 +79,30 @@ export default function AdminSettingsPage() {
         body: JSON.stringify({
           store_name: settings.store_name,
           support_email: settings.support_email,
-          currency: settings.currency,
+          currency: 'MAD',
           flat_rate: settings.flat_rate,
-          free_shipping_threshold: settings.free_shipping_threshold,
+          free_shipping_threshold:
+            settings.free_shipping_threshold,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || 'Could not save settings');
+        throw new Error(
+          data?.error || 'Could not save settings'
+        );
       }
 
       setSettings({
         id: data.id,
         store_name: data.store_name ?? '',
         support_email: data.support_email ?? '',
-        currency: data.currency ?? 'USD',
+        currency: 'MAD',
         flat_rate: Number(data.flat_rate ?? 0),
-        free_shipping_threshold: Number(data.free_shipping_threshold ?? 0),
+        free_shipping_threshold: Number(
+          data.free_shipping_threshold ?? 0
+        ),
       });
 
       setSaved(true);
@@ -129,13 +136,6 @@ export default function AdminSettingsPage() {
       </div>
     );
   }
-
-  const currencySymbol =
-    settings.currency === 'EUR'
-      ? '€'
-      : settings.currency === 'GBP'
-        ? '£'
-        : '$';
 
   return (
     <div className="max-w-2xl">
@@ -173,7 +173,10 @@ export default function AdminSettingsPage() {
                 type="email"
                 value={settings.support_email}
                 onChange={(e) =>
-                  updateField('support_email', e.target.value)
+                  updateField(
+                    'support_email',
+                    e.target.value
+                  )
                 }
                 className="input-field mt-1"
               />
@@ -184,17 +187,9 @@ export default function AdminSettingsPage() {
                 Currency
               </label>
 
-              <select
-                value={settings.currency}
-                onChange={(e) =>
-                  updateField('currency', e.target.value)
-                }
-                className="input-field mt-1"
-              >
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-              </select>
+              <div className="input-field mt-1 bg-obsidian/5">
+                MAD — Moroccan Dirham (د.م.)
+              </div>
             </div>
           </div>
         </section>
@@ -207,16 +202,19 @@ export default function AdminSettingsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs text-obsidian/50 uppercase tracking-wide">
-                Flat Rate ({currencySymbol})
+                Flat Rate (د.م.)
               </label>
 
               <input
                 type="number"
                 min="0"
-                step="0.01"
+                step="1"
                 value={settings.flat_rate}
                 onChange={(e) =>
-                  updateField('flat_rate', Number(e.target.value))
+                  updateField(
+                    'flat_rate',
+                    Number(e.target.value)
+                  )
                 }
                 className="input-field mt-1"
               />
@@ -224,13 +222,13 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="text-xs text-obsidian/50 uppercase tracking-wide">
-                Free Shipping Threshold ({currencySymbol})
+                Free Shipping Threshold (د.م.)
               </label>
 
               <input
                 type="number"
                 min="0"
-                step="0.01"
+                step="1"
                 value={settings.free_shipping_threshold}
                 onChange={(e) =>
                   updateField(
