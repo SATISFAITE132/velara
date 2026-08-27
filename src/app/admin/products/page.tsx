@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -207,7 +207,7 @@ export default function AdminProductsPage() {
                           </div>
 
                           <div className="text-xs text-obsidian/40">
-                            {p.size || '—'}
+                            {p.size || 'â€”'}
                           </div>
                         </div>
                       </div>
@@ -218,11 +218,11 @@ export default function AdminProductsPage() {
                     </td>
 
                     <td className="p-4">
-                      {Number(p.price).toFixed(2)} د.م.
+                      {Number(p.price).toFixed(2)} Ø¯.Ù….
 
                       {p.compare_at_price && (
                         <span className="ml-2 text-xs line-through text-obsidian/40">
-                          {Number(p.compare_at_price).toFixed(2)} د.م.
+                          {Number(p.compare_at_price).toFixed(2)} Ø¯.Ù….
                         </span>
                       )}
                     </td>
@@ -390,10 +390,7 @@ function ProductFormModal({
         product?.id ||
         crypto.randomUUID(),
 
-      slug:
-        slug.trim() ||
-        product?.slug ||
-        generatedSlug,
+      slug: generatedSlug,
 
       name: cleanName,
 
@@ -791,3 +788,5 @@ function ProductFormModal({
     </div>
   );
 }
+
+
