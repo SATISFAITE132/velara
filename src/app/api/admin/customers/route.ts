@@ -15,7 +15,6 @@ export async function GET() {
 
     if (customersError) {
       console.error('Customers GET error:', customersError.message);
-
       return NextResponse.json(
         { error: customersError.message },
         { status: 500 }
@@ -28,37 +27,13 @@ export async function GET() {
 
     if (ordersError) {
       console.error('Orders GET error:', ordersError.message);
-
       return NextResponse.json(
         { error: ordersError.message },
         { status: 500 }
       );
     }
 
-       console.log('CUSTOMERS COUNT:', customers?.length ?? 0);
-    console.log('CUSTOMERS NAMES:', customers?.map((c) => c.full_name));
-console.log(
-  'SUPABASE PROJECT:',
-  process.env.NEXT_PUBLIC_SUPABASE_URL
-);
-console.log(
-  'SERVICE KEY LENGTH:',
-  process.env.SUPABASE_SERVICE_ROLE_KEY?.length ?? 0
-);
-console.log(
-  'CUSTOMER IDS:',
-  customers?.map((c) => c.id)
-);
-const { data: aichaTest, error: aichaTestError } = await supabase
-  .from('customers')
-  .select('id, full_name, email')
-  .eq('id', '932d37ec-cd1b-4b16-a13f-94b0df203adf')
-  .maybeSingle();
-
-console.log('AICHA DIRECT TEST:', aichaTest);
-console.log('AICHA DIRECT ERROR:', aichaTestError);
- 
-const customersWithStats = (customers ?? []).map((customer) => {
+    const customersWithStats = (customers ?? []).map((customer) => {
       const customerOrders = (orders ?? []).filter(
         (order) => order.customer_id === customer.id
       );

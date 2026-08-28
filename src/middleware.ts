@@ -1,10 +1,8 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
-  console.log('MIDDLEWARE:', request.nextUrl.pathname);
-
   let response = NextResponse.next({
     request,
   });
@@ -47,7 +45,15 @@ export async function middleware(request: NextRequest) {
   const isAdminApi =
     pathname.startsWith('/api/admin/');
 
-  if ((isAdminPage || isAdminApi) && !user) {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+
+  const isAuthorizedAdmin =
+    !!user &&
+    !!user.email &&
+    !!adminEmail &&
+    user.email.trim().toLowerCase() === adminEmail;
+
+  if ((isAdminPage || isAdminApi) && !isAuthorizedAdmin) {
     if (isAdminApi) {
       return NextResponse.json(
         { error: 'Unauthorized' },

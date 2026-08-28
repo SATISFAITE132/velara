@@ -1,4 +1,4 @@
-﻿import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import ProductGallery from '@/components/ProductGallery';
 import AddToBagPanel from '@/components/AddToBagPanel';
@@ -100,10 +100,6 @@ export default async function ProductPage({
 
   const currency = 'MAD';
   const currencySymbol = getCurrencySymbol(currency);
-  console.log('RAW PRODUCT:', productData);
-console.log('INGREDIENTS:', productData.ingredients);
-console.log('HOW TO USE:', productData.how_to_use);
-console.log('STORY:', productData.story);
 
   const { data: reviewData } = await supabase
     .from('reviews')
@@ -164,7 +160,7 @@ console.log('STORY:', productData.story);
             </div>
 
             <span className="text-sm text-obsidian/50">
-              {product.rating} Â· {product.reviewCount} reviews
+              {product.rating} · {product.reviewCount} reviews
             </span>
           </div>
 
@@ -198,7 +194,7 @@ console.log('STORY:', productData.story);
 
               <p className="text-sm text-obsidian/60">
                 {product.ingredients.length > 0
-                  ? product.ingredients.join(' Â· ')
+                  ? product.ingredients.join(' · ')
                   : 'Details coming soon.'}
               </p>
             </div>
@@ -282,7 +278,7 @@ console.log('STORY:', productData.story);
               </p>
 
               <p className="text-xs text-obsidian/40 mt-2">
-                {r.author} Â· {r.date}
+                {r.author} · {r.date}
               </p>
             </div>
           ))}
