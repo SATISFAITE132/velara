@@ -52,12 +52,7 @@ export async function middleware(request: NextRequest) {
     !!user.email &&
     !!adminEmail &&
     user.email.trim().toLowerCase() === adminEmail;
-    console.log('ADMIN AUTH DEBUG', {
-  hasUser: !!user,
-  hasUserEmail: !!user?.email,
-  hasAdminEmail: !!adminEmail,
-  isAuthorizedAdmin,
-});
+
 
   if ((isAdminPage || isAdminApi) && !isAuthorizedAdmin) {
     if (isAdminApi) {
