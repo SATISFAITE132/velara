@@ -4,6 +4,7 @@ import ProductGallery from '@/components/ProductGallery';
 import AddToBagPanel from '@/components/AddToBagPanel';
 import ProductCard from '@/components/ProductCard';
 import RevealSection from '@/components/RevealSection';
+import ReviewForm from '@/components/ReviewForm';
 import { Star } from 'lucide-react';
 import type { Product, Review } from '@/lib/types';
 import { getCurrencySymbol } from '@/lib/currency';
@@ -101,11 +102,12 @@ export default async function ProductPage({
   const currency = 'MAD';
   const currencySymbol = getCurrencySymbol(currency);
 
-  const { data: reviewData } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('product_id', product.id)
-    .order('created_at', { ascending: false });
+ const { data: reviewData } = await supabase
+  .from('reviews')
+  .select('*')
+  .eq('product_id', product.id)
+  .eq('approved', true)
+  .order('created_at', { ascending: false });
 
   const reviews: Review[] = (reviewData ?? []).map(normalizeReview);
 
@@ -159,9 +161,9 @@ export default async function ProductPage({
               ))}
             </div>
 
-            <span className="text-sm text-obsidian/50">
-              {product.rating} · {product.reviewCount} reviews
-            </span>
+           <span className="text-sm text-obsidian/50">
+  {product.rating} · {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
+</span>
           </div>
 
           <div className="flex items-baseline gap-3 mt-6">
@@ -283,6 +285,7 @@ export default async function ProductPage({
             </div>
           ))}
         </div>
+        <ReviewForm productId={product.id} />
       </RevealSection>
 
       {related.length > 0 && (

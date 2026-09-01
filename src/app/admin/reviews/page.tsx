@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ type Review = {
   product_id: string | null;
   customer_id: string | null;
   author: string;
+  email: string | null;
   rating: number;
   title: string | null;
   body: string | null;
@@ -134,79 +136,125 @@ export default function AdminReviewsPage() {
           No reviews yet.
         </div>
       ) : (
-        <div className="space-y-4">
-          {reviews.map((review) => (
-            <div
-              key={review.id}
-              className="bg-cream border border-obsidian/10 p-5 flex justify-between items-start gap-4"
-            >
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <Star
-                        key={index}
-                        size={13}
-                        className={
-                          index < review.rating
-                            ? 'fill-gold text-gold'
-                            : 'text-obsidian/20'
-                        }
-                      />
-                    ))}
-                  </div>
+        <div className="overflow-x-auto border border-obsidian/10">
+          <table className="w-full min-w-[900px] bg-cream">
+            <thead>
+              <tr className="border-b border-obsidian/10 text-left">
+                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                  Email
+                </th>
+                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                  Name
+                </th>
+                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                  Rating
+                </th>
+                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                  Review
+                </th>
+                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                  Product
+                </th>
+                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                  Status
+                </th>
+                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                  Date
+                </th>
+                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                  Actions
+                </th>
+              </tr>
+            </thead>
 
-                  <span className="font-medium text-sm">
-                    {review.title || 'Untitled review'}
-                  </span>
-
-                  {review.verified && (
-                    <span className="text-[10px] uppercase text-success">
-                      Verified
-                    </span>
-                  )}
-
-                  {review.approved && (
-                    <span className="text-[10px] uppercase text-success">
-                      Approved
-                    </span>
-                  )}
-                </div>
-
-                <p className="text-sm text-obsidian/60 mt-2 max-w-xl">
-                  {review.body || ''}
-                </p>
-
-                <p className="text-xs text-obsidian/40 mt-2">
-                  {review.author} on{' '}
-                  {productName(review.product_id)} ·{' '}
-                  {new Date(review.created_at).toLocaleDateString()}
-                </p>
-              </div>
-
-              <div className="flex gap-3 shrink-0">
-                {!review.approved && (
-                  <button
-                    onClick={() => approveReview(review.id)}
-                    aria-label="Approve review"
-                    className="p-2 border border-obsidian/15 hover:bg-success/10"
-                  >
-                    <Check size={15} />
-                  </button>
-                )}
-
-                <button
-                  onClick={() => deleteReview(review.id)}
-                  aria-label="Delete review"
-                  className="p-2 border border-obsidian/15 hover:bg-error/10"
+            <tbody>
+              {reviews.map((review) => (
+                <tr
+                  key={review.id}
+                  className="border-b border-obsidian/10 last:border-b-0 align-top"
                 >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            </div>
-          ))}
+                  <td className="px-4 py-4 text-sm">
+                    {review.email || 'Not provided'}
+                  </td>
+
+                  <td className="px-4 py-4 text-sm font-medium">
+                    {review.author}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <Star
+                          key={index}
+                          size={13}
+                          className={
+                            index < review.rating
+                              ? 'fill-gold text-gold'
+                              : 'text-obsidian/20'
+                          }
+                        />
+                      ))}
+                    </div>
+                  </td>
+
+                  <td className="px-4 py-4 text-sm text-obsidian/60 max-w-xs">
+                    {review.body || ''}
+                  </td>
+
+                  <td className="px-4 py-4 text-sm">
+                    {productName(review.product_id)}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    {review.approved ? (
+                      <span className="text-[10px] uppercase text-success">
+                        Approved
+                      </span>
+                    ) : (
+                      <span className="text-[10px] uppercase text-obsidian/40">
+                        Pending
+                      </span>
+                    )}
+
+                    {review.verified && (
+                      <div className="text-[10px] uppercase text-success mt-1">
+                        Verified
+                      </div>
+                    )}
+                  </td>
+
+                  <td className="px-4 py-4 text-sm text-obsidian/50 whitespace-nowrap">
+                    {new Date(review.created_at).toLocaleDateString()}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    <div className="flex gap-2">
+                      {!review.approved && (
+                        <button
+                          onClick={() => approveReview(review.id)}
+                          aria-label="Approve review"
+                          className="p-2 border border-obsidian/15 hover:bg-success/10"
+                        >
+                          <Check size={15} />
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => deleteReview(review.id)}
+                        aria-label="Delete review"
+                        className="p-2 border border-obsidian/15 hover:bg-error/10"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
   );
 }
+
