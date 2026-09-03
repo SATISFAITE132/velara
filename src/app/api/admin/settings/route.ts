@@ -41,7 +41,44 @@ export async function PATCH(request: Request) {
       currency,
       flat_rate,
       free_shipping_threshold,
+      tracking_pixels,
     } = body;
+
+    const cleanTrackingPixels = {
+      meta: Array.isArray(tracking_pixels?.meta)
+        ? tracking_pixels.meta
+            .map((id: unknown) =>
+              typeof id === 'string' ? id.trim() : ''
+            )
+            .filter(Boolean)
+        : [],
+
+      tiktok: Array.isArray(tracking_pixels?.tiktok)
+        ? tracking_pixels.tiktok
+            .map((id: unknown) =>
+              typeof id === 'string' ? id.trim() : ''
+            )
+            .filter(Boolean)
+        : [],
+
+      google_analytics: Array.isArray(
+        tracking_pixels?.google_analytics
+      )
+        ? tracking_pixels.google_analytics
+            .map((id: unknown) =>
+              typeof id === 'string' ? id.trim() : ''
+            )
+            .filter(Boolean)
+        : [],
+
+      snapchat: Array.isArray(tracking_pixels?.snapchat)
+        ? tracking_pixels.snapchat
+            .map((id: unknown) =>
+              typeof id === 'string' ? id.trim() : ''
+            )
+            .filter(Boolean)
+        : [],
+    };
 
     const supabase = createAdminClient();
 
@@ -53,6 +90,7 @@ export async function PATCH(request: Request) {
         currency,
         flat_rate,
         free_shipping_threshold,
+        tracking_pixels: cleanTrackingPixels,
         updated_at: new Date().toISOString(),
       })
       .eq('id', 1)

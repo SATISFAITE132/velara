@@ -80,13 +80,19 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
     };
 
-    // Save order
-    const { error: orderError } = await supabase
-      .from('orders')
-      .insert(order);
+    // Save order and return its real database ID
+    const { data: savedOrder, error: orderError } =
+      await supabase
+        .from('orders')
+        .insert(order)
+        .select('id')
+        .single();
 
     if (orderError) {
-      console.error('Order insert error:', orderError.message);
+      console.error(
+        'Order insert error:',
+        orderError.message
+      );
 
       return NextResponse.json(
         { error: orderError.message },
@@ -95,6 +101,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
+      orderId: savedOrder.id,
       orderNumber,
       status: 'pending',
     });

@@ -233,60 +233,77 @@ export default async function ProductPage({
       </div>
 
       <RevealSection className="mt-24 max-w-3xl">
-        <h2 className="font-display text-2xl mb-8">
-          Customer Reviews
-        </h2>
+  <details className="group">
+    <summary className="cursor-pointer list-none">
+      <div className="flex items-center justify-between border-b border-obsidian/10 pb-6">
+        <div>
+          <h2 className="font-display text-2xl">
+            Customer Reviews
+          </h2>
 
-        <div className="space-y-6">
-          {reviews.length === 0 && (
-            <p className="text-sm text-obsidian/50">
-              No reviews yet for this product.
-            </p>
-          )}
+          <p className="text-sm text-obsidian/50 mt-1">
+            {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
+          </p>
+        </div>
 
-          {reviews.map((r) => (
-            <div
-              key={r.id}
-              className="border-b border-obsidian/10 pb-6"
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      size={12}
-                      className={
-                        i < r.rating
-                          ? 'fill-gold text-gold'
-                          : 'text-obsidian/20'
-                      }
-                    />
-                  ))}
-                </div>
+        <span className="text-sm underline underline-offset-4">
+          View Reviews
+        </span>
+      </div>
+    </summary>
 
-                <span className="text-sm font-medium">
-                  {r.title}
-                </span>
+    <div className="pt-8">
+      <div className="space-y-6">
+        {reviews.length === 0 && (
+          <p className="text-sm text-obsidian/50">
+            No reviews yet for this product.
+          </p>
+        )}
 
-                {r.verified && (
-                  <span className="text-[10px] uppercase tracking-wide text-success">
-                    Verified
-                  </span>
-                )}
+        {reviews.map((r) => (
+          <div
+            key={r.id}
+            className="border-b border-obsidian/10 pb-6"
+          >
+            <div className="flex items-center gap-2">
+              <div className="flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    size={12}
+                    className={
+                      i < r.rating
+                        ? 'fill-gold text-gold'
+                        : 'text-obsidian/20'
+                    }
+                  />
+                ))}
               </div>
 
-              <p className="text-sm text-obsidian/60 mt-2">
-                {r.body}
-              </p>
-
-              <p className="text-xs text-obsidian/40 mt-2">
-                {r.author} · {r.date}
-              </p>
+              {r.verified && (
+                <span className="text-[10px] uppercase tracking-wide text-success">
+                  Verified
+                </span>
+              )}
             </div>
-          ))}
-        </div>
-        <ReviewForm productId={product.id} />
-      </RevealSection>
+
+            <div className="mt-2 w-full max-w-full overflow-y-auto max-h-20">
+  <p className="text-sm text-obsidian/60 leading-6 max-w-[75%] break-words">
+    {r.body}
+  </p>
+</div>
+
+            <p className="text-xs text-obsidian/40 mt-2">
+              {r.author} · {r.date}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <ReviewForm productId={product.id} />
+    </div>
+  </details>
+</RevealSection>
 
       {related.length > 0 && (
         <section className="mt-28">

@@ -4,6 +4,8 @@ import '@/styles/globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
+import TrackingPixels from '@/components/TrackingPixels';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { Toaster } from 'sonner';
 
 const fraunces = Fraunces({
@@ -23,24 +25,46 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Velara — Liquid Gold for Hair',
-  description: 'Luxury hair oils blended in small batches. 24-karat gold elixirs, repair treatments, and scalp serums.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  description:
+    'Luxury hair oils blended in small batches. 24-karat gold elixirs, repair treatments, and scalp serums.',
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      'http://localhost:3000'
+  ),
   openGraph: {
     title: 'Velara — Liquid Gold for Hair',
-    description: 'Luxury hair oils blended in small batches.',
+    description:
+      'Luxury hair oils blended in small batches.',
     type: 'website',
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
+    <html
+      lang="en"
+      className={`${fraunces.variable} ${inter.variable}`}
+    >
       <body>
+        <TrackingPixels />
+        <AnalyticsTracker />
+
         <Header />
+
         <main>{children}</main>
+
         <Footer />
+
         <CartDrawer />
-        <Toaster position="bottom-center" richColors />
+
+        <Toaster
+          position="bottom-center"
+          richColors
+        />
       </body>
     </html>
   );

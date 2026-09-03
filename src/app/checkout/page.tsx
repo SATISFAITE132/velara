@@ -1,9 +1,10 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/store/cart';
 import { formatPrice } from '@/lib/currency';
+import { trackEvent } from '@/lib/analytics';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function CheckoutPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const trackedCheckoutStart = useRef(false);
 
   useEffect(() => {
     async function loadSettings() {
@@ -46,6 +49,29 @@ export default function CheckoutPage() {
 
     loadSettings();
   }, []);
+
+  useEffect(() => {
+    if (lines.length === 0) {
+      return;
+    }
+
+    if (trackedCheckoutStart.current) {
+      return;
+    }
+
+    trackedCheckoutStart.current = true;
+
+    trackEvent('checkout_start', {
+      value: subtotal(),
+      path: window.location.pathname,
+      metadata: {
+        items_count: lines.reduce(
+          (sum, line) => sum + line.quantity,
+          0
+        ),
+      },
+    });
+  }, [lines, subtotal]);
 
   const currentSubtotal = subtotal();
 
@@ -129,6 +155,20 @@ export default function CheckoutPage() {
           data?.error || 'Could not place order'
         );
       }
+
+      await trackEvent('purchase', {
+        orderId: data.orderId,
+        value: total,
+        path: window.location.pathname,
+        metadata: {
+          order_number: data.orderNumber,
+          payment_method: 'cash_on_delivery',
+          items_count: lines.reduce(
+            (sum, line) => sum + line.quantity,
+            0
+          ),
+        },
+      });
 
       clear();
 

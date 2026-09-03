@@ -7,6 +7,7 @@ import { Product } from '@/lib/types';
 import { useCart } from '@/store/cart';
 import { Star } from 'lucide-react';
 import { formatPrice } from '@/lib/currency';
+import { trackEvent } from '@/lib/analytics';
 
 export default function ProductCard({
   product,
@@ -17,11 +18,32 @@ export default function ProductCard({
 }) {
   const addItem = useCart((s) => s.addItem);
 
+  function handleAddToBag(
+    event: React.MouseEvent<HTMLButtonElement>
+  ) {
+    event.preventDefault();
+
+    addItem(product);
+
+    trackEvent('add_to_cart', {
+      productId: product.id,
+      value: product.price,
+      path: window.location.pathname,
+      metadata: {
+        product_name: product.name,
+        quantity: 1,
+      },
+    });
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
+      viewport={{
+        once: true,
+        margin: '-60px',
+      }}
       transition={{
         duration: 0.6,
         delay: (index % 4) * 0.08,
@@ -92,7 +114,9 @@ export default function ProductCard({
 
             {product.compareAtPrice && (
               <span className="text-sm text-obsidian/40 line-through">
-                {formatPrice(product.compareAtPrice)}
+                {formatPrice(
+                  product.compareAtPrice
+                )}
               </span>
             )}
           </div>
@@ -100,10 +124,7 @@ export default function ProductCard({
       </Link>
 
       <button
-        onClick={(e) => {
-          e.preventDefault();
-          addItem(product);
-        }}
+        onClick={handleAddToBag}
         className="mt-3 w-full btn-outline text-xs py-2.5"
       >
         Add to Bag

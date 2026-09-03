@@ -1,11 +1,12 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Product } from '@/lib/types';
 import { useCart } from '@/store/cart';
 import { formatPrice } from '@/lib/currency';
+import { trackEvent } from '@/lib/analytics';
 
 export default function AddToBagPanel({
   product,
@@ -14,6 +15,42 @@ export default function AddToBagPanel({
 }) {
   const [qty, setQty] = useState(1);
   const addItem = useCart((s) => s.addItem);
+  const trackedProductView = useRef(false);
+
+  useEffect(() => {
+    if (trackedProductView.current) {
+      return;
+    }
+
+    trackedProductView.current = true;
+
+    trackEvent('product_view', {
+      productId: product.id,
+      path: window.location.pathname,
+      metadata: {
+        product_name: product.name,
+        product_slug: product.slug,
+      },
+    });
+  }, [product.id, product.name, product.slug]);
+
+  function handleAddToBag() {
+    addItem(product, qty);
+
+    trackEvent('add_to_cart', {
+      productId: product.id,
+      value: product.price * qty,
+      path: window.location.pathname,
+      metadata: {
+        product_name: product.name,
+        quantity: qty,
+      },
+    });
+
+    toast.success(
+      `${product.name} added to your bag`
+    );
+  }
 
   return (
     <div className="flex items-center gap-4 mt-8">
@@ -45,12 +82,7 @@ export default function AddToBagPanel({
 
       <button
         className="btn-primary flex-1"
-        onClick={() => {
-          addItem(product, qty);
-          toast.success(
-            `${product.name} added to your bag`
-          );
-        }}
+        onClick={handleAddToBag}
       >
         Add to Bag — {formatPrice(product.price * qty)}
       </button>

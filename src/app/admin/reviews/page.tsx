@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -137,31 +136,38 @@ export default function AdminReviewsPage() {
         </div>
       ) : (
         <div className="overflow-x-auto border border-obsidian/10">
-          <table className="w-full min-w-[900px] bg-cream">
+          <table className="w-full min-w-[1000px] table-fixed bg-cream">
             <thead>
               <tr className="border-b border-obsidian/10 text-left">
-                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+                <th className="w-[18%] px-4 py-4 text-xs uppercase tracking-wider font-medium">
                   Email
                 </th>
-                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+
+                <th className="w-[12%] px-4 py-4 text-xs uppercase tracking-wider font-medium">
                   Name
                 </th>
-                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+
+                <th className="w-[12%] px-4 py-4 text-xs uppercase tracking-wider font-medium">
                   Rating
                 </th>
-                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+
+                <th className="w-[25%] px-4 py-4 text-xs uppercase tracking-wider font-medium">
                   Review
                 </th>
-                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+
+                <th className="w-[10%] px-4 py-4 text-xs uppercase tracking-wider font-medium">
                   Product
                 </th>
-                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+
+                <th className="w-[8%] px-4 py-4 text-xs uppercase tracking-wider font-medium">
                   Status
                 </th>
-                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+
+                <th className="w-[8%] px-4 py-4 text-xs uppercase tracking-wider font-medium">
                   Date
                 </th>
-                <th className="px-4 py-4 text-xs uppercase tracking-wider font-medium">
+
+                <th className="w-[7%] px-4 py-4 text-xs uppercase tracking-wider font-medium">
                   Actions
                 </th>
               </tr>
@@ -173,11 +179,11 @@ export default function AdminReviewsPage() {
                   key={review.id}
                   className="border-b border-obsidian/10 last:border-b-0 align-top"
                 >
-                  <td className="px-4 py-4 text-sm">
+                  <td className="px-4 py-4 text-sm break-words">
                     {review.email || 'Not provided'}
                   </td>
 
-                  <td className="px-4 py-4 text-sm font-medium">
+                  <td className="px-4 py-4 text-sm font-medium break-words">
                     {review.author}
                   </td>
 
@@ -197,11 +203,13 @@ export default function AdminReviewsPage() {
                     </div>
                   </td>
 
-                  <td className="px-4 py-4 text-sm text-obsidian/60 max-w-xs">
-                    {review.body || ''}
+                  <td className="px-4 py-4 text-sm text-obsidian/60">
+                    <p className="max-h-16 overflow-hidden break-words leading-5">
+                      {review.body || ''}
+                    </p>
                   </td>
 
-                  <td className="px-4 py-4 text-sm">
+                  <td className="px-4 py-4 text-sm break-words">
                     {productName(review.product_id)}
                   </td>
 
@@ -215,16 +223,12 @@ export default function AdminReviewsPage() {
                         Pending
                       </span>
                     )}
-
-                    {review.verified && (
-                      <div className="text-[10px] uppercase text-success mt-1">
-                        Verified
-                      </div>
-                    )}
                   </td>
 
-                  <td className="px-4 py-4 text-sm text-obsidian/50 whitespace-nowrap">
-                    {new Date(review.created_at).toLocaleDateString()}
+                  <td className="px-4 py-4 text-sm text-obsidian/50">
+                    {new Date(
+                      review.created_at
+                    ).toLocaleDateString()}
                   </td>
 
                   <td className="px-4 py-4">
@@ -257,4 +261,3 @@ export default function AdminReviewsPage() {
     </div>
   );
 }
-
