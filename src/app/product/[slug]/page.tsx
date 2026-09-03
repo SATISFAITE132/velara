@@ -8,6 +8,8 @@ import ReviewForm from '@/components/ReviewForm';
 import { Star } from 'lucide-react';
 import type { Product, Review } from '@/lib/types';
 import { getCurrencySymbol } from '@/lib/currency';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 function parseArray(value: any): string[] {
   if (Array.isArray(value)) {
