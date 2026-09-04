@@ -75,9 +75,9 @@ const emptyData: InsightsData = {
 };
 
 function formatMoney(value: number) {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('fr-MA', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'MAD',
     maximumFractionDigits: 2,
   }).format(value);
 }
